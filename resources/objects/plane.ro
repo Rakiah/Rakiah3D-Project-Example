@@ -1,0 +1,4 @@
+paths-type: absolute
+path-texture: resources/textures/brick.bmp
+path-object: resources/meshes/plane.obj
+mat-color: 0 255 255 255

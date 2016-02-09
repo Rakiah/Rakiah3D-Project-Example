@@ -1,0 +1,22 @@
+# bind, use/new, path or item id, height, rotation x, rotation y, rotation z, scale x, scale y, scale z
+# id are calculated on the order of bind (starting by 1)
+bind new resources/objects/plane.ro 0 0 0 0 1 1 1
+bind use 1 4 90 0 90 3 1 1
+bind use 1 4 0 0 90 3 1 1
+bind use 1 4 -90 0 90 3 1 1
+bind use 1 4 180 0 90 3 1 1
+bind new resources/objects/sword.ro 2 0 0 0 0.2 0.2 0.2
+0 2 2 2 2 2 2 2 2 2 2 2 2 2 0
+5 1 1 1 1 1 1 1 1 1 1 1 1 1 3
+5 1 1 3|5|4 1 1 1 1 1 1 1 1 1 1 3
+5 1 1 3|5 1 1 1 1 1 1 1 1 1 1 3
+5 1 1 3|5 1 1 1 1 1 1 1 1 1 1 3
+5 1 1 3|5 1 1 1 1 1 1 1 1 1 1 3
+5 1 1 3|5 1 1 1 1 1 1 1 1 1 1 3
+5 1 1 3|5 1 1 1 1 1 1 1 1 1 1 3
+5 1 1 3|5|2 1 1 1 1 1 1 1 1 1 1 3
+5 1 1 1 1 1 1 1 1 1 1 1 1 1 3
+5 1 1 1 1 1 1 1 1 1 1|6 1 1 1 3
+5 1 1 1 1 1 1 1 1 1 1 1 1 1 3
+5 1 1 1 1 1 1 1 1 1 1 1 1 1 3
+0 4 4 4 4 4 4 4 4 4 4 4 4 4 0

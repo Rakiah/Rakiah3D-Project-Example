@@ -1,0 +1,4 @@
+paths-type: absolute
+path-texture: resources/textures/swd_tex.bmp
+path-object: resources/meshes/sword.obj
+mat-color: 0 255 255 255

@@ -1,4 +1,5 @@
 #include <r3d.h>
+#include <wolf3d.h>
 
 void	process_input()
 {
@@ -8,14 +9,15 @@ void	process_input()
 
 	core = get_core();
 	camera = core->window->camera->transform;
+	v3f_set(&motion, 0, 0, 0);
 	if (get_key_down(A))
-		motion.x -= core->delta_time;
+		motion.x -= core->delta_time * 30;
 	if (get_key_down(D))
-		motion.x += core->delta_time;
+		motion.x += core->delta_time * 30;
 	if (get_key_down(W))
-		motion.z += core->delta_time;
+		motion.z += core->delta_time * 30;
 	if (get_key_down(S))
-		motion.z -= core->delta_time;
+		motion.z -= core->delta_time * 30;
 	motion = trs_transform_direction(camera, &motion);
 	trs_translate(camera, &motion);
 }
@@ -34,22 +36,24 @@ void	mouse_look()
 	screen_halfs.y = core->window->height / 2;
 	mouse_pos = get_mouse_pos();
 	v3f_set(&motion,
-		(mouse_pos.x - screen_halfs.x) * core->delta_time,
-		(mouse_pos.y - screen_halfs.y) * core->delta_time, 0);
+		(mouse_pos.y - screen_halfs.y) * core->delta_time * 10,
+		(mouse_pos.x - screen_halfs.x) * core->delta_time * 10, 0);
 	trs_rotate(camera, &motion);
-}
-
-void	*w3ds_loader(char *path)
-{
-	(void)path;
-	return (NULL);
 }
 
 void	update()
 {
 	static int	frames = 0;
 	static float	timer = 0.0f;
+	static t_bool	skip_frame = TRUE;
 
+	if (skip_frame)
+	{
+		skip_frame = FALSE;
+		return ;
+	}
+	mouse_look();
+	process_input();
 	frames++;
 	timer += get_core()->delta_time;
 	if (timer >= 1.0f)
@@ -66,9 +70,9 @@ int	main(void)
 {
 	core_init(update, NULL, NULL, 60);
 	camera_new_init(window_new(800, 600, "wolf3D"));
-	core_add_loader(w3ds_loader, ft_strdup("w3ds"));
+	core_add_loader(w3d_loader, ft_strdup("w3d"));
 	core_lock_cursor(TRUE);
-	load("level_1.w3ds");
+	load("resources/scenes/level_1.w3d");
 	core_start();
 	return (0);
 }
