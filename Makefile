@@ -24,6 +24,7 @@ CLIBS = -l r3d \
 	-l ft \
 	-l rlists \
 	-l SDL2 \
+	-l SDL2_ttf \
 	-l m
 OBJ = $(SRC:.c=.o)
 

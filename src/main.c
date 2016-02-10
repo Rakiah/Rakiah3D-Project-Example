@@ -46,14 +46,25 @@ void	update()
 	static int	frames = 0;
 	static float	timer = 0.0f;
 	static t_bool	skip_frame = TRUE;
+	static t_bool	paused = FALSE;
 
 	if (skip_frame)
 	{
 		skip_frame = FALSE;
 		return ;
 	}
-	mouse_look();
-	process_input();
+	if (!paused)
+	{
+		mouse_look();
+		process_input();
+	}
+	if (get_key_up(P))
+	{
+		paused = !paused;
+		core_lock_cursor(!paused);
+		((t_ui_element *)get_core()->ui_renderer->elements->start->data)->active = paused;
+		((t_button *)get_core()->ui_renderer->buttons->start->data)->active = paused;
+	}
 	frames++;
 	timer += get_core()->delta_time;
 	if (timer >= 1.0f)
@@ -65,13 +76,44 @@ void	update()
 		timer = 0.0f;
 	}
 }
+void	mouse_click_down(t_button *button, void *data)
+{
+	(void)button;
+	(void)data;
+	/*ft_putendl("click down");*/
+}
+
+void	mouse_click_up(t_button *button, void *data)
+{
+	(void)button;
+	(void)data;
+	exit(0);
+	/*ft_putendl("click up");*/
+
+}
+
+void	mouse_hover(t_button *button, void *data)
+{
+	(void)button;
+	(void)data;
+	/*ft_putendl("hover");*/
+}
 
 int	main(void)
 {
+	t_button	*button;
+	t_rect		button_rect;
+
+	button_rect = (t_rect) { 20, 20, 200, 30 };
 	core_init(update, NULL, NULL, 60);
-	camera_new_init(window_new(800, 600, "wolf3D"));
+	camera_new_init(window_new(1000, 600, "wolf3D"));
 	core_add_loader(w3d_loader, ft_strdup("w3d"));
 	core_lock_cursor(TRUE);
+	button = button_new_init(&button_rect, "Quit", mouse_click_up, NULL);
+	button->active = FALSE;
+	button->drawable->active = FALSE;
+	button_bind_click_down(button, mouse_click_down, NULL);
+	button_bind_mouse_hover(button, mouse_hover, NULL);
 	load("resources/scenes/level_1.w3d");
 	core_start();
 	return (0);
