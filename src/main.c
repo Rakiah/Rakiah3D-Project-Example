@@ -19,6 +19,7 @@ void	process_input()
 	if (get_key_down(S))
 		motion.z -= core->delta_time * 30;
 	motion = trs_transform_direction(camera, &motion);
+	v3f_print(&camera->position);
 	trs_translate(camera, &motion);
 }
 
@@ -55,8 +56,8 @@ void	update()
 	}
 	if (!paused)
 	{
-		mouse_look();
-		process_input();
+		/*mouse_look();*/
+		/*process_input();*/
 	}
 	if (get_key_up(P))
 	{
@@ -106,7 +107,7 @@ int	main(void)
 
 	button_rect = (t_rect) { 20, 20, 200, 30 };
 	core_init(update, NULL, NULL, 60);
-	camera_new_init(window_new(1000, 600, "wolf3D"));
+	create_fps_player(window_new(1000, 600, "wolf3d"));
 	core_add_loader(w3d_loader, ft_strdup("w3d"));
 	core_lock_cursor(TRUE);
 	button = button_new_init(&button_rect, "Quit", mouse_click_up, NULL);
