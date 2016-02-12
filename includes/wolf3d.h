@@ -2,7 +2,8 @@
 #include "rlists.h"
 #include "get_next_line.h"
 
-typedef struct s_binded_object t_binded_object;
+typedef struct s_binded_object	t_binded_object;
+typedef struct s_alias		t_alias;
 
 struct	s_binded_object
 {
@@ -10,6 +11,12 @@ struct	s_binded_object
 	t_vector3f	rotation;
 	t_vector3f	scale;
 	t_object	*item;
+};
+
+struct	s_alias
+{
+	char *alias;
+	char *real;
 };
 
 void		*w3d_loader(char *path);

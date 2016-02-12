@@ -19,7 +19,6 @@ void	process_input()
 	if (get_key_down(S))
 		motion.z -= core->delta_time * 30;
 	motion = trs_transform_direction(camera, &motion);
-	v3f_print(&camera->position);
 	trs_translate(camera, &motion);
 }
 

@@ -15,12 +15,37 @@ static void item_object_clearer(t_node *iterated)
 	free(iterated->data);
 }
 
-static void parse_map(char **splitted, t_list *items, t_core *core)
+static int parse_index(char *index)
+{
+	if (*index >= 'A' && *index <= 'Z')
+		return (10 + (*index - 'A'));
+	else if (*index >= '0' && *index <= '9')
+		return (*index - '0');
+	return (-1);
+}
+
+static char *find_alias(char *to_find, t_list *alias)
+{
+	t_alias *iter;
+	char	*result;
+
+	result = NULL;
+	list_set_start(alias);
+	while ((iter = list_next(alias)) != NULL)
+	{
+		if (ft_strequ(to_find, iter->alias))
+			result = iter->real;
+	}
+	return (result);
+}
+
+static void parse_map(char **splitted, t_list *items, t_list *alias, t_core *core)
 {
 	static int	y = 0;
 	int		x;
 	int		sub_x;
 	char		**sub_split;
+	char		*alias_real;
 	t_binded_object *item;
 	t_object	*tmp;
 	int		id;
@@ -28,13 +53,15 @@ static void parse_map(char **splitted, t_list *items, t_core *core)
 	x = -1;
 	while (splitted[++x] != NULL)
 	{
-		if ((id = ft_atoi(splitted[x]) - 1) < 0)
+		if ((id = parse_index(splitted[x]) - 1) < 0)
 			continue ;
+		if ((alias_real = find_alias(splitted[x], alias)) == NULL)
+			alias_real = splitted[x];
 		sub_x = -1;
-		sub_split = ft_strsplit(splitted[x], '|', NULL);
+		sub_split = ft_strsplit(alias_real, '|', NULL);
 		while (sub_split[++sub_x] != NULL)
 		{
-			id = ft_atoi(sub_split[sub_x]) -1;
+			id = parse_index(sub_split[sub_x]) -1;
 			item = list_get_data_at(items, id);
 			tmp = obj_new_init_mesh(core->window, item->item->mesh);
 			v3f_set(&tmp->transform->position, x * 2, item->height, y * 2);
@@ -44,6 +71,17 @@ static void parse_map(char **splitted, t_list *items, t_core *core)
 		line_free(sub_split, NULL);
 	}
 	y++;
+}
+
+static void parse_alias(char **splitted, t_list *aliases)
+{
+	t_alias *alias;
+
+	if ((alias = malloc(sizeof(t_alias))) == NULL)
+		error_exit("alloc failed");
+	alias->alias = ft_strdup(splitted[1]);
+	alias->real = ft_strdup(splitted[2]);
+	list_push_back(aliases, alias);
 }
 
 static void parse_bind(char **splitted, t_list *items)
@@ -71,12 +109,14 @@ void		*w3d_loader(char *path)
 {
 	char	**split;
 	t_list	*items;
+	t_list	*aliases;
 	t_core	*core;
 	char	*line;
 	int	fd;
 
 	core = get_core();
 	items = list_new(sizeof(t_binded_object *));
+	aliases = list_new(sizeof(t_alias *));
 	if ((fd = open(path, O_RDONLY)) < 0)
 		error_exit("no file found");
 	while (get_next_line(fd, &line))
@@ -87,10 +127,12 @@ void		*w3d_loader(char *path)
 			line_free(split, line);
 			continue ;
 		}
+		else if (ft_strequ(split[0], "alias"))
+			parse_alias(split, aliases);
 		else if (ft_strequ(split[0], "bind"))
 			parse_bind(split, items);
 		else
-			parse_map(split, items, core);
+			parse_map(split, items, aliases, core);
 		line_free(split, line);
 	}
 	list_clear_inner(items, item_object_clearer);
