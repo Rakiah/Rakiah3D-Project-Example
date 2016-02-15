@@ -106,15 +106,14 @@ int	main(void)
 
 	button_rect = (t_rect) { 20, 20, 200, 30 };
 	core_init(update, NULL, NULL, 60);
-	create_fps_player(window_new(1000, 600, "wolf3d"));
 	core_add_loader(w3d_loader, ft_strdup("w3d"));
+	create_fps_player(window_new(1000, 600, "wolf3d"));
 	core_lock_cursor(TRUE);
 	button = button_new_init(&button_rect, "Quit", mouse_click_up, NULL);
 	button->active = FALSE;
 	button->drawable->active = FALSE;
 	button_bind_click_down(button, mouse_click_down, NULL);
 	button_bind_mouse_hover(button, mouse_hover, NULL);
-	load("resources/scenes/level_1.w3d");
 	core_start();
 	return (0);
 }

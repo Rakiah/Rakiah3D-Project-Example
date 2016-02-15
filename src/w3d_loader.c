@@ -39,7 +39,7 @@ static char *find_alias(char *to_find, t_list *alias)
 	return (result);
 }
 
-static void parse_map(char **splitted, t_list *items, t_list *alias, t_core *core)
+static void parse_map(char **splitted, t_list *items, t_list *alias, t_list *map)
 {
 	static int	y = 0;
 	int		x;
@@ -48,13 +48,24 @@ static void parse_map(char **splitted, t_list *items, t_list *alias, t_core *cor
 	char		*alias_real;
 	t_binded_object *item;
 	t_object	*tmp;
+	t_core		*core;
+	t_list		*line;
+	t_block		*block;
 	int		id;
 
+	line = list_new(sizeof(t_block **));
+	core = get_core();
 	x = -1;
 	while (splitted[++x] != NULL)
 	{
+		block = malloc(sizeof(t_block));
+		block->collider = FALSE;
+		block->floor_height = 0.0f;
 		if ((id = parse_index(splitted[x]) - 1) < 0)
+		{
+			list_push_back(line, block);
 			continue ;
+		}
 		if ((alias_real = find_alias(splitted[x], alias)) == NULL)
 			alias_real = splitted[x];
 		sub_x = -1;
@@ -64,12 +75,19 @@ static void parse_map(char **splitted, t_list *items, t_list *alias, t_core *cor
 			id = parse_index(sub_split[sub_x]) -1;
 			item = list_get_data_at(items, id);
 			tmp = obj_new_init_mesh(core->window, item->item->mesh);
-			v3f_set(&tmp->transform->position, x * 2, item->height, y * 2);
+			v3f_set(&tmp->transform->position, x * 4, item->height, y * 4);
 			tmp->transform->rotation = item->rotation;
 			tmp->transform->scale = item->scale;
+			if (item->collision)
+			{
+				block->collider = TRUE;
+				block->floor_height = item->floor_height;
+			}
 		}
+		list_push_back(line, block);
 		line_free(sub_split, NULL);
 	}
+	list_push_back(map, line);
 	y++;
 }
 
@@ -84,6 +102,7 @@ static void parse_alias(char **splitted, t_list *aliases)
 	list_push_back(aliases, alias);
 }
 
+#include <stdio.h>
 static void parse_bind(char **splitted, t_list *items)
 {
 	t_binded_object	*item;
@@ -102,7 +121,33 @@ static void parse_bind(char **splitted, t_list *items)
 	v3f_set(&item->scale, strtod(splitted[7], NULL),
 				strtod(splitted[8], NULL),
 				strtod(splitted[9], NULL));
+	item->collision = ft_strequ(splitted[10], "yes");
+	item->floor_height = strtod(splitted[11], NULL);
 	list_push_back(items, item);
+}
+
+static t_w3d_scene	*list_to_scene(t_list *map)
+{
+	t_w3d_scene	*scene;
+	t_list		*iterator;
+	t_block		***map_blocks;
+	int		i;
+
+	scene = malloc(sizeof(t_w3d_scene));
+	map_blocks = malloc(sizeof(t_block **) * map->count);
+	scene->height = map->count;
+	i = 0;
+	while ((iterator = list_next(map)) != NULL)
+	{
+		map_blocks[i] = (t_block **)list_to_array(iterator);
+		scene->width = iterator->count;
+		list_clear(iterator);
+		i++;
+	}
+	list_clear_inner(map, list_default_remove_functor);
+	free(map);
+	scene->map = map_blocks;
+	return (scene);
 }
 
 void		*w3d_loader(char *path)
@@ -110,11 +155,11 @@ void		*w3d_loader(char *path)
 	char	**split;
 	t_list	*items;
 	t_list	*aliases;
-	t_core	*core;
+	t_list	*map;
 	char	*line;
 	int	fd;
 
-	core = get_core();
+	map = list_new(sizeof(t_block *));
 	items = list_new(sizeof(t_binded_object *));
 	aliases = list_new(sizeof(t_alias *));
 	if ((fd = open(path, O_RDONLY)) < 0)
@@ -132,9 +177,9 @@ void		*w3d_loader(char *path)
 		else if (ft_strequ(split[0], "bind"))
 			parse_bind(split, items);
 		else
-			parse_map(split, items, aliases, core);
+			parse_map(split, items, aliases, map);
 		line_free(split, line);
 	}
 	list_clear_inner(items, item_object_clearer);
-	return (NULL);
+	return (list_to_scene(map));
 }

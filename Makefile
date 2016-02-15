@@ -15,7 +15,7 @@ PATH_SRC = src/
 PATH_HEADERS = -I includes/ -I libft/includes/ -I rakiah3D/includes/ -I rlists/includes/ -I SDL2/includes/
 SRC = $(PATH_SRC)main.c $(PATH_SRC)w3d_loader.c $(PATH_SRC)mouse_look.c $(PATH_SRC)player_object.c
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -O3
+CFLAGS = -Wall -Wextra -Werror -O3 -g
 CLIBS_PATH = -L rakiah3D/ \
 	     -L libft/ \
 	     -L SDL2/ \
