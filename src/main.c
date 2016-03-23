@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: bkabbas <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2016/03/22 12:53:43 by bkabbas           #+#    #+#             */
+/*   Updated: 2016/03/23 14:44:50 by bkabbas          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <r3d.h>
 #include <wolf3d.h>
 
@@ -43,7 +55,7 @@ void	mouse_look()
 
 void	update()
 {
-	static int	frames = 0;
+	static int		frames = 0;
 	static float	timer = 0.0f;
 	static t_bool	skip_frame = TRUE;
 	static t_bool	paused = FALSE;
@@ -80,7 +92,6 @@ void	mouse_click_down(t_button *button, void *data)
 {
 	(void)button;
 	(void)data;
-	/*ft_putendl("click down");*/
 }
 
 void	mouse_click_up(t_button *button, void *data)
@@ -88,32 +99,42 @@ void	mouse_click_up(t_button *button, void *data)
 	(void)button;
 	(void)data;
 	exit(0);
-	/*ft_putendl("click up");*/
-
 }
 
 void	mouse_hover(t_button *button, void *data)
 {
 	(void)button;
 	(void)data;
-	/*ft_putendl("hover");*/
 }
 
 int	main(void)
 {
 	t_button	*button;
 	t_rect		button_rect;
+	t_vector2f	window_size;
+	t_vector2f	button_size;
 
-	button_rect = (t_rect) { 20, 20, 200, 30 };
+	button_size = (t_vector2f) { 200, 30 };
+	window_size = (t_vector2f) { 800, 600 };
+	button_rect = (t_rect)	{
+								(window_size.x / 2) - (button_size.x / 2),
+								(window_size.y / 2) - (button_size.y / 2),
+								button_size.x, button_size.y
+							};
 	core_init(update, NULL, NULL, 60);
 	core_add_loader(w3d_loader, ft_strdup("w3d"));
-	create_fps_player(window_new(1000, 600, "wolf3d"));
+	create_fps_player(window_new(window_size.x, window_size.y, "wolf3d"));
 	core_lock_cursor(TRUE);
 	button = button_new_init(&button_rect, "Quit", mouse_click_up, NULL);
 	button->active = FALSE;
 	button->drawable->active = FALSE;
 	button_bind_click_down(button, mouse_click_down, NULL);
 	button_bind_mouse_hover(button, mouse_hover, NULL);
+	SDL_Surface *s;
+
+	s = SDL_LoadBMP("resources/textures/swd_tex.bmp");
+	
+
 	core_start();
 	return (0);
 }

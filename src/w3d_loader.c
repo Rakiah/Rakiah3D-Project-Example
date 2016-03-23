@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   w3d_loader.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: bkabbas <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2016/03/23 12:02:45 by bkabbas           #+#    #+#             */
+/*   Updated: 2016/03/23 12:06:54 by bkabbas          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "wolf3d.h"
 
 static void line_free(char **splitted, char *line)
@@ -91,7 +103,7 @@ static void parse_map(char **splitted, t_list *items, t_list *alias, t_list *map
 	y++;
 }
 
-static void parse_alias(char **splitted, t_list *aliases)
+static void			parse_alias(char **splitted, t_list *aliases)
 {
 	t_alias *alias;
 
@@ -102,8 +114,7 @@ static void parse_alias(char **splitted, t_list *aliases)
 	list_push_back(aliases, alias);
 }
 
-#include <stdio.h>
-static void parse_bind(char **splitted, t_list *items)
+static void			parse_bind(char **splitted, t_list *items)
 {
 	t_binded_object	*item;
 
@@ -150,14 +161,14 @@ static t_w3d_scene	*list_to_scene(t_list *map)
 	return (scene);
 }
 
-void		*w3d_loader(char *path)
+void				*w3d_loader(char *path)
 {
 	char	**split;
 	t_list	*items;
 	t_list	*aliases;
 	t_list	*map;
 	char	*line;
-	int	fd;
+	int		fd;
 
 	map = list_new(sizeof(t_block *));
 	items = list_new(sizeof(t_binded_object *));
